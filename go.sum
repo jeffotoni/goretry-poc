@@ -1,0 +1,6 @@
+github.com/jeffotoni/log v0.0.0-20260701231817-4763d2844a46 h1:GrueeEnnzoaoNVu4isALxqCZu8iD3DLI2rnr5xdKSm8=
+github.com/jeffotoni/log v0.0.0-20260701231817-4763d2844a46/go.mod h1:nXluiWMWzh10JOIpP+CarQJBek+BiHEPmoHUY+9H36E=
+github.com/jeffotoni/quick v0.0.0-20260916061017-fd614be69617 h1:HZwLeVPkBsJRset1QOWbVCkDOIjiX9Mac0Taa4lKi+Q=
+github.com/jeffotoni/quick v0.0.0-20260916061017-fd614be69617/go.mod h1:iyk6gVF052LLIK2vKIeS54QjyZt/tCbIDO1K9gkQzZc=
+github.com/jeffotoni/req v0.0.0-20260701194954-809ad4113121 h1:S/7PXr3PYq80dTcV99iC+n7+gWVO+Rvms5mir+sIUmE=
+github.com/jeffotoni/req v0.0.0-20260701194954-809ad4113121/go.mod h1:oW0vL2jOG2j5HgwXi1FsJ1UJloW9+UphYaugimS1Rjw=
