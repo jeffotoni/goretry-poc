@@ -93,6 +93,51 @@ The delay has a maximum limit and can use jitter to prevent multiple requests fr
 
 The default retry window is three minutes. When it expires, the request is discarded and the event is logged as retry window expired. There is no infinite retry loop.
 
+### Retry Timing and Execution Model
+
+With the default configuration, a request that receives a retryable `502` follows this timing:
+
+~~~text
+initial attempt: immediately -> 502
+retry #1:        after approximately 500ms
+retry #2:        after approximately 1s
+retry #3:        after approximately 2s
+retry #4:        after approximately 4s
+retry #5:        after approximately 8s
+retry #6:        after approximately 16s
+later retries:   up to 30s between attempts
+total limit:     3-minute retry window
+~~~
+
+Jitter is enabled by default, so the actual delays vary approximately as follows:
+
+~~~text
+500ms -> 400-600ms
+1s    -> 800-1200ms
+2s    -> 1.6-2.4s
+~~~
+
+With `POC_RETRY_JITTER=false`, the delays are exact.
+
+The execution flow is:
+
+~~~text
+502 initial response
+  -> request enters the queue
+  -> handler returns 202 Accepted
+  -> worker waits for the backoff
+  -> worker executes the retry
+~~~
+
+Each request has its own retry cycle. This is not a circuit breaker and the system does not open a global blocked state. Protection comes from:
+
+- Bounded queue.
+- Fixed worker pool.
+- Maximum three-minute window.
+- Increasing backoff.
+- Maximum 30-second delay.
+- No new goroutine per attempt.
+
 ## Components
 
 ~~~text

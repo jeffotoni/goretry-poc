@@ -93,6 +93,51 @@ O atraso possui um limite maximo e pode usar jitter para evitar que varias requi
 
 A janela padrao e de tres minutos. Ao expirar, a requisicao e descartada e o evento e registrado como `retry window expired`. Nao existe tentativa infinita.
 
+### Tempos e modelo de execucao
+
+Com a configuracao padrao, uma requisicao que recebe um `502` retryable segue estes tempos:
+
+```text
+chamada inicial: imediatamente -> 502
+retry #1:        apos aproximadamente 500ms
+retry #2:        apos aproximadamente 1s
+retry #3:        apos aproximadamente 2s
+retry #4:        apos aproximadamente 4s
+retry #5:        apos aproximadamente 8s
+retry #6:        apos aproximadamente 16s
+proximas:        ate 30s entre tentativas
+limite total:    janela de retry de 3 minutos
+```
+
+O jitter esta ativo por padrao, portanto os atrasos reais variam aproximadamente assim:
+
+```text
+500ms -> 400-600ms
+1s    -> 800-1200ms
+2s    -> 1.6-2.4s
+```
+
+Com `POC_RETRY_JITTER=false`, os atrasos sao exatos.
+
+O fluxo de execucao e:
+
+```text
+resposta inicial 502
+  -> requisicao entra na fila
+  -> handler responde 202 Accepted
+  -> worker aguarda o backoff
+  -> worker executa o retry
+```
+
+Cada requisicao possui seu proprio ciclo de retry. Este mecanismo nao e um circuit breaker e o sistema nao abre um estado global de bloqueio. A protecao vem de:
+
+- Fila limitada.
+- Worker pool fixo.
+- Janela maxima de tres minutos.
+- Backoff crescente.
+- Atraso maximo de 30 segundos.
+- Nenhuma goroutine nova por tentativa.
+
 ## Componentes
 
 ```text
